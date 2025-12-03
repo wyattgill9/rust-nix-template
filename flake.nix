@@ -52,7 +52,7 @@
 
           buildInputs = []
             ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.libiconv
+             pkgs.libiconv
             ];
         };
 
@@ -62,7 +62,9 @@
           inherit cargoArtifacts;
         });
       in {
-        formatter = pkgs.alejandra;
+        formatter = pkgs.writeShellScriptBin "formatter" ''
+          ${toolchain}/bin/cargo fmt
+        '';
 
         checks = {
           inherit rust-package;
