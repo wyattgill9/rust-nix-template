@@ -1,6 +1,16 @@
 [package]
-name = "rust_test"
+name = "tsdb_test"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+tsdb_core = { path = "crates/core" }
+capnp.workspace = true
+
+[workspace]
+members = ["crates/core"]
+resolver = "2"
+
+[workspace.dependencies]
+capnp = "0.23"
+capnpc = "0.23"

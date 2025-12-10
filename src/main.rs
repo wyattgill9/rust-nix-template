@@ -1,12 +1,5 @@
-fn test(x: &mut u32) {
-    *x += 1;
-    println!("{}", x);
-}
+use tsdb_core;
 
 fn main() {
-    println!("Hello, world!");
-
-    let mut x: u32 = 5;
-
-    test(&mut x);
+    tsdb_core::test();
 }

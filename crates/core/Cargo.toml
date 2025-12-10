@@ -1,0 +1,10 @@
+[package]
+name = "tsdb_core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+capnp.workspace = true
+
+[build-dependencies]
+capnpc.workspace = true
