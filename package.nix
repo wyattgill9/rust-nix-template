@@ -11,7 +11,7 @@ in
     src = ./.;
     filter = capnpOrCargo;
     name = "source";
-  }
+  };
 
   commonArgs = {
     inherit src;
