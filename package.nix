@@ -1,8 +1,17 @@
 {
   pkgs,
   craneLib,
-}: let
-  src = craneLib.cleanCargoSource ./.;
+}: 
+let
+  capnpFilter = path: _type: builtins.match ".*\.capnp$" path != null;
+  capnpOrCargo = path: type:
+    (capnpFilter path type) || (craneLib.filterCargoSources path type);
+in
+  src = craneLib.cleanSourceWith {
+    src = ./.;
+    filter = capnpOrCargo;
+    name = "source";
+  }
 
   commonArgs = {
     inherit src;
