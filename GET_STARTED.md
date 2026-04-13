@@ -57,7 +57,6 @@ This runs inside Nix's sandbox. No network, no mutable state, no `~/.cargo`. The
 | **rust-overlay** | Reads `rust-toolchain.toml` and provides that exact toolchain from the Nix store |
 | **crane** | Builds dependencies once (`cargoArtifacts`), then your source separately — CI caches the expensive part |
 | **treefmt-nix** | `nix fmt` formats Rust, Nix, and TOML in one shot |
-| **git-hooks-nix** | Pre-commit hooks: format, clippy, merge conflict detection, large file check |
 | **mold** | Drop-in linker replacement — 3–10× faster link times for edit-rebuild cycles |
 | **sccache** | Compiler cache across branches and clean builds |
 | **cargo-nextest** | Faster test runner with better output and per-test isolation |
@@ -115,8 +114,7 @@ nix flake check    # run all checks (clippy, fmt, tests) in Nix
     ├── toolchain.nix         # rust-overlay + crane setup
     ├── packages.nix          # Nix package definitions (crane builds)
     ├── devshell.nix          # Dev shell with tools and env vars
-    ├── fmt.nix               # treefmt config (rustfmt, nixfmt, taplo)
-    └── hooks.nix             # Pre-commit hooks
+    └── fmt.nix               # treefmt config (rustfmt, nixfmt, taplo)
 ```
 
 ---
@@ -179,22 +177,6 @@ buildInputs = with pkgs; [
 ```
 
 If the library ships a `.pc` file, `pkg-config` is already in `nativeBuildInputs` and will pick it up automatically.
-
----
-
-## Pre-commit hooks
-
-Hooks are installed automatically the first time you enter the dev shell. Every commit runs:
-
-- `treefmt` — enforces consistent formatting (Rust, Nix, TOML)
-- `clippy` — lints your Rust code
-- `check-merge-conflict` — catches leftover conflict markers
-- `check-added-large-files` — prevents accidental binary commits
-
-To reinstall manually:
-```bash
-nix develop -c pre-commit install
-```
 
 ---
 
