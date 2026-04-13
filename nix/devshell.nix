@@ -27,7 +27,7 @@
         buildInputs =
           with pkgs;
           [
-            openssl
+            # openssl
           ]
           ++ lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.Security
