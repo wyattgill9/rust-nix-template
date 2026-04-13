@@ -1,47 +1,55 @@
 {
-  description = "Rust development environment";
+  description = "NixOS Rust workspace";
+
+  nixConfig = {
+    extra-substituters = [ ];
+    extra-trusted-public-keys = [ ];
+  };
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    crane.url = "github:ipetkov/crane";
-    fenix = {
-      url = "github:nix-community/fenix";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    crane = {
+      url = "github:ipetkov/crane";
+    };
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    git-hooks-nix = {
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = {
-    nixpkgs,
-    crane,
-    fenix,
-    ...
-  }: let
-    systems = ["x86_64-linux" "aarch64-darwin"];
-    eachSystem = f:
-      nixpkgs.lib.genAttrs systems (system:
-        f {
-          inherit system;
-          pkgs = nixpkgs.legacyPackages.${system};
-          toolchain = fenix.packages.${system}.stable.toolchain;
-          craneLib =
-            (crane.mkLib nixpkgs.legacyPackages.${system}).overrideToolchain
-            fenix.packages.${system}.stable.toolchain;
-        });
-  in {
-    packages = eachSystem ({
-      pkgs,
-      craneLib,
-      ...
-    }: {
-      default = import ./package.nix {inherit pkgs craneLib;};
-    });
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
-    devShells = eachSystem ({
-      pkgs,
-      toolchain,
-      ...
-    }: {
-      default = import ./shell.nix {inherit pkgs toolchain;};
-    });
-  };
+      imports = [
+        inputs.treefmt-nix.flakeModule
+        inputs.git-hooks-nix.flakeModule
+        ./nix/toolchain.nix
+        ./nix/packages.nix
+        ./nix/devshell.nix
+        ./nix/fmt.nix
+        ./nix/hooks.nix
+      ];
+    };
 }

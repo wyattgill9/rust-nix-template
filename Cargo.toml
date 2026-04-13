@@ -1,16 +1,7 @@
-[package]
-name = "tsdb_test"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-tsdb_core = { path = "crates/core" }
-capnp.workspace = true
-
 [workspace]
-members = ["crates/core"]
+members = ["crates/cli"]
+
+default-members = ["crates/cli"]
 resolver = "2"
 
 [workspace.dependencies]
-capnp = "0.23"
-capnpc = "0.23"
