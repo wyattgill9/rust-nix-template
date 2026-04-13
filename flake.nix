@@ -28,10 +28,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    git-hooks-nix = {
-      url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -44,12 +40,10 @@
 
       imports = [
         inputs.treefmt-nix.flakeModule
-        inputs.git-hooks-nix.flakeModule
         ./nix/toolchain.nix
         ./nix/packages.nix
         ./nix/devshell.nix
         ./nix/fmt.nix
-        ./nix/hooks.nix
       ];
     };
 }
