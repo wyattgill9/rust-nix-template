@@ -30,7 +30,7 @@
         craneLib.buildPackage (
           commonArgs
           // {
-            inherit cargoArtifacts;
+            inherit cargoArtifacts pname;
             cargoExtraArgs = "-p ${pname}";
           }
         );
