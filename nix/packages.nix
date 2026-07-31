@@ -4,7 +4,6 @@
     {
       pkgs,
       craneLib,
-      lib,
       ...
     }:
     let
@@ -18,15 +17,10 @@
           pkg-config
         ];
 
-        buildInputs =
-          with pkgs;
-          [
-            openssl
-          ]
-          ++ lib.optionals pkgs.stdenv.isDarwin [
-            pkgs.darwin.apple_sdk.frameworks.Security
-            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-          ];
+        # Darwin SDK frameworks come from the stdenv now — no apple_sdk stubs.
+        buildInputs = with pkgs; [
+          openssl
+        ];
       };
 
       cargoArtifacts = craneLib.buildDepsOnly commonArgs;
@@ -45,6 +39,26 @@
       packages = {
         cli = mkCrate "cli";
         default = mkCrate "cli";
+      };
+
+      # `nix flake check` runs these plus treefmt (added by the treefmt-nix module).
+      checks = {
+        clippy = craneLib.cargoClippy (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+            cargoClippyExtraArgs = "--all-targets -- --deny warnings";
+          }
+        );
+
+        test = craneLib.cargoNextest (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+            partitions = 1;
+            partitionType = "count";
+          }
+        );
       };
 
       _module.args = {

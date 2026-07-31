@@ -15,31 +15,33 @@
           rustToolchain
           pkgs.pkg-config
 
-          pkgs.mold
           pkgs.sccache
           pkgs.clang
           pkgs.lldb
 
           pkgs.cargo-nextest
           pkgs.cargo-llvm-cov
+        ]
+        # mold and wild are ELF-only, so Linux-only.
+        ++ lib.optionals pkgs.stdenv.isLinux [
+          pkgs.mold
+          pkgs.wild
         ];
 
-        buildInputs =
-          with pkgs;
-          [
-            # openssl
-          ]
-          ++ lib.optionals pkgs.stdenv.isDarwin [
-            pkgs.darwin.apple_sdk.frameworks.Security
-            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-          ];
+        # Darwin SDK frameworks come from the stdenv now — no apple_sdk stubs.
+        buildInputs = with pkgs; [
+          # openssl
+        ];
 
         RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
         PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
 
         shellHook = ''
           export RUSTC_WRAPPER=sccache
-          export RUSTFLAGS="''${RUSTFLAGS:-} -C link-arg=-fuse-ld=mold"
+        ''
+        + lib.optionalString pkgs.stdenv.isLinux ''
+          # Pick the linker with LINKER=wild (or LINKER=lld, LINKER=bfd, ...).
+          export RUSTFLAGS="''${RUSTFLAGS:-} -C link-arg=-fuse-ld=''${LINKER:-mold}"
         '';
       };
     };
