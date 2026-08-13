@@ -15,9 +15,15 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v5
-      - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/nix-installer-action@main
+      # Backs the store with the Actions cache, so evix (114 crates, not in
+      # cache.nixos.org) and the crane deps survive between runs.
+      - uses: DeterminateSystems/magic-nix-cache-action@main
 
       # One parallel eval of every flake output (checks, packages, devShells,
       # formatter) instead of nix's single-threaded `flake check` walk.
