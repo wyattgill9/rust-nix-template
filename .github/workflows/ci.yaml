@@ -9,9 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  SYSTEM: x86_64-linux
-
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -21,30 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: DeterminateSystems/nix-installer-action@main
-      # Backs the store with the Actions cache, so evix (114 crates, not in
-      # cache.nixos.org) and the crane deps survive between runs.
+      # Backs the store with the Actions cache, so the toolchain and crane's
+      # deps-only derivation survive between runs.
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      # One parallel eval of every flake output (checks, packages, devShells,
-      # formatter) instead of nix's single-threaded `flake check` walk.
-      # Root each eval at one output. `--force-recurse` from the flake root
-      # would descend into `inputs.nixpkgs.legacyPackages` and evaluate all of
-      # nixpkgs.
-      - name: Evaluate
-        run: |
-          for root in checks packages devShells; do
-            nix run github:manic-systems/evix -- eval \
-              --flake ".#$root" --force-recurse \
-              --workers "$(nproc)" \
-              > "jobs-$root.ndjson"
-          done
-          if jq -e 'select(has("error"))' jobs-*.ndjson; then
-            echo "::error::flake evaluation failed" && exit 1
-          fi
-
-      # devShells are evaluated but not built: mkShell's builder refuses to run.
-      - name: Build
-        run: |
-          mapfile -t drvs < <(jq -r --arg s "$SYSTEM" 'select(.system == $s) | .drvPath + "^*"' jobs-checks.ndjson jobs-packages.ndjson)
-          [ "${#drvs[@]}" -gt 0 ] || { echo "::error::nothing evaluated for $SYSTEM" && exit 1; }
-          nix build -L --keep-going "${drvs[@]}"
+      - run: nix flake check -L
+      - run: nix build -L
