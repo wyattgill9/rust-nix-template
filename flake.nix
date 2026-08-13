@@ -2,8 +2,8 @@
   description = "NixOS Rust workspace";
 
   nixConfig = {
-    extra-substituters = [ ];
-    extra-trusted-public-keys = [ ];
+    extra-substituters = [];
+    extra-trusted-public-keys = [];
   };
 
   inputs = {
@@ -27,12 +27,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
   };
 
-  outputs =
-    inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
