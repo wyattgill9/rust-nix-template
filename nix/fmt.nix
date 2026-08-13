@@ -5,7 +5,7 @@
 
       programs = {
         rustfmt.enable = true;
-        nixfmt.enable = true;
+        alejandra.enable = true;
         taplo.enable = true;
       };
     };
