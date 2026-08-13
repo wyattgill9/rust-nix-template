@@ -19,7 +19,6 @@
           pkgs.lldb
 
           pkgs.cargo-nextest
-          pkgs.cargo-llvm-cov
         ]
         # mold and wild are ELF-only, so Linux-only.
         ++ lib.optionals pkgs.stdenv.isLinux [
