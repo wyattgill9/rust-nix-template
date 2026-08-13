@@ -1,10 +1,10 @@
 # rust-nix-template
 
-Rust workspace with a Nix-provided toolchain. Cargo for the dev loop, Nix for reproducible builds.
+Rust workspace. Nix provides the toolchain. Cargo runs the dev loop. Nix builds reproducibly.
 
 ## Setup
 
-Requires [Nix](https://nixos.org/download) with flakes.
+Needs [Nix](https://nixos.org/download) with flakes.
 
 ```bash
 git clone https://github.com/your-org/your-repo
@@ -15,14 +15,14 @@ direnv allow   # or: nix develop
 ## Commands
 
 ```bash
-cargo build        # dev loop — incremental
-cargo test         # nextest
-nix build          # hermetic, sandboxed
-nix flake check    # clippy, fmt, tests
-nix fmt            # rust, nix, toml
+cargo build          # dev loop, incremental
+cargo nextest run    # tests
+nix build            # hermetic, sandboxed
+nix flake check      # clippy, tests, formatting
+nix fmt              # rust, nix, toml
 ```
 
-Use Cargo inside the shell. Nix only provides the environment. Do not route `cargo check` through `nix build` — it discards incremental compilation.
+Run Cargo inside the shell. Nix only provides the environment. Do not route `cargo check` through `nix build`. That discards incremental compilation.
 
 ## Layout
 
@@ -39,18 +39,16 @@ nix/
 
 ## Common changes
 
-**Rust version** — edit `rust-toolchain.toml`. Keep `rust-src`; rust-analyzer needs it.
+**Rust version** — edit `rust-toolchain.toml`. Keep `rust-src`. rust-analyzer needs it.
 
 **New crate** — create `crates/my-crate/`, add it to `members` in the root `Cargo.toml`, then add `my-crate = mkCrate "my-crate";` to `nix/packages.nix`.
 
-**Native library** — add it to `buildInputs` in *both* `nix/packages.nix` and `nix/devshell.nix`. `pkg-config` is already present.
+**Native library** — add it to `buildInputs` in `nix/packages.nix` *and* `nix/devshell.nix`. `pkg-config` is present.
 
-**New system** — add to `systems` in `flake.nix` (`x86_64-linux`, `aarch64-darwin` by default).
+**New system** — add it to `systems` in `flake.nix`. The defaults are `x86_64-linux` and `aarch64-darwin`.
 
-**Binary cache** — fill in `nixConfig.extra-substituters` and `extra-trusted-public-keys` in `flake.nix`.
+**Binary cache** — set `nixConfig.extra-substituters` and `extra-trusted-public-keys` in `flake.nix`.
 
 ## Build model
 
-`buildDepsOnly` → `cargoArtifacts` (rebuilds only on `Cargo.lock` change) → `buildPackage` → binary. Source changes only rebuild the second derivation.
-</content>
-</invoke>
+`buildDepsOnly` builds `cargoArtifacts`, and rebuilds only when `Cargo.lock` changes. `buildPackage` then builds the binary. A source change rebuilds only the second derivation.
