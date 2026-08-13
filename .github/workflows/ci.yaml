@@ -5,11 +5,31 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  SYSTEM: x86_64-linux
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: cachix/install-nix-action@v31
-      - run: nix flake check -L
-      - run: nix build -L
+
+      # One parallel eval of every flake output (checks, packages, devShells,
+      # formatter) instead of nix's single-threaded `flake check` walk.
+      - name: Evaluate
+        run: |
+          nix run github:manic-systems/evix -- eval \
+            --flake . --force-recurse \
+            --workers "$(nproc)" \
+            --gc-roots-dir gcroots \
+            > jobs.ndjson
+          if jq -e 'select(has("error"))' jobs.ndjson; then
+            echo "::error::flake evaluation failed" && exit 1
+          fi
+
+      - name: Build
+        run: |
+          mapfile -t drvs < <(jq -r --arg s "$SYSTEM" 'select(.system == $s) | .drvPath + "^*"' jobs.ndjson)
+          [ "${#drvs[@]}" -gt 0 ] || { echo "::error::nothing evaluated for $SYSTEM" && exit 1; }
+          nix build -L --keep-going "${drvs[@]}"
