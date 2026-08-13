@@ -12,7 +12,14 @@ profile = "default"
 
 # rust-src is CRITICAL on NixOS: without it, rust-analyzer cannot find
 # the standard library sources.
-components = ["rust-src", "rust-analyzer", "clippy", "rustfmt"]
+components = [
+  "rust-src",
+  "rust-analyzer",
+  "clippy",
+  "rustfmt",
+  # Required by cargo-llvm-cov; without it the tool errors out.
+  "llvm-tools-preview",
+]
 
 # Cross-compilation targets:
 # targets = ["wasm32-unknown-unknown", "aarch64-unknown-linux-gnu"]

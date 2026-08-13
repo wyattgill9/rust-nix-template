@@ -16,7 +16,6 @@
           pkgs.pkg-config
 
           pkgs.sccache
-          pkgs.clang
           pkgs.lldb
 
           pkgs.cargo-nextest
@@ -37,6 +36,8 @@
         PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
 
         shellHook = ''
+          # No-op until the workspace has dependencies: sccache can't cache bin crates
+          # (they link) or incremental units. Pays off ~-40% on release rebuilds later.
           export RUSTC_WRAPPER=sccache
         ''
         + lib.optionalString pkgs.stdenv.isLinux ''
