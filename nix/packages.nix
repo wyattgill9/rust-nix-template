@@ -14,10 +14,7 @@
         pkg-config
       ];
 
-      # Darwin SDK frameworks come from the stdenv now — no apple_sdk stubs.
-      buildInputs = with pkgs; [
-        openssl
-      ];
+      buildInputs = with pkgs; [ ];
     };
 
     cargoArtifacts = craneLib.buildDepsOnly commonArgs;
