@@ -1,7 +1,8 @@
-{inputs, ...}: {
+{...}: {
   perSystem = {
     pkgs,
     craneLib,
+    config,
     ...
   }: let
     src = craneLib.cleanCargoSource ../.;
@@ -10,11 +11,11 @@
       inherit src;
       strictDeps = true;
 
-      nativeBuildInputs = with pkgs; [
-        pkg-config
-      ];
+      nativeBuildInputs = with pkgs; [];
 
-      buildInputs = with pkgs; [ ];
+      buildInputs = with pkgs; [
+        openssl
+      ];
     };
 
     cargoArtifacts = craneLib.buildDepsOnly commonArgs;
@@ -51,8 +52,6 @@
       );
     };
 
-    _module.args = {
-      inherit commonArgs cargoArtifacts src;
-    };
+    _module.args = {inherit commonArgs;};
   };
 }

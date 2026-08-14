@@ -2,29 +2,24 @@
   perSystem = {
     pkgs,
     rustToolchain,
-    craneLib,
     lib,
-    config,
+    commonArgs,
     ...
   }: {
     devShells.default = pkgs.mkShell {
+      inherit (commonArgs) buildInputs;
+
       nativeBuildInputs =
-        [
+        commonArgs.nativeBuildInputs
+        ++ [
           rustToolchain
           pkgs.lldb
           pkgs.sccache
           pkgs.cargo-nextest
-
-          pkgs.pkg-config
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [pkgs.wild];
 
-      buildInputs = with pkgs; [
-        # openssl
-      ];
-
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
-      PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
 
       shellHook =
         ''
