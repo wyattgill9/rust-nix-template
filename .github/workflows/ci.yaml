@@ -37,9 +37,7 @@ jobs:
 
       - name: Evaluate
         run: nix flake check -L    
-        # OR
         # run: fix flake check --extra-experimental-features flakes
-        # OR
         # run: |
         #   for root in checks packages devShells; do
         #     nix run github:manic-systems/evix -- eval \
@@ -53,7 +51,6 @@ jobs:
 
       - name: Build
         run: nix build -L
-        # OR
         # run: |
         #   mapfile -t drvs < <(jq -r --arg s "$SYSTEM" 'select(.system == $s) | .drvPath + "^*"' jobs-checks.ndjson jobs-packages.ndjson)
         #   [ "${#drvs[@]}" -gt 0 ] || { echo "::error::nothing evaluated for $SYSTEM" && exit 1; }
