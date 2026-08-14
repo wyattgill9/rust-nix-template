@@ -45,8 +45,6 @@ nix/
 
 **Native library** — add it to `buildInputs` in `nix/packages.nix` *and* `nix/devshell.nix`. `pkg-config` is present.
 
-**New system** — add it to `systems` in `flake.nix`. The defaults are `x86_64-linux` and `aarch64-darwin`.
-
 **Binary cache** — set `nixConfig.extra-substituters` and `extra-trusted-public-keys` in `flake.nix`.
 
 ## Build model
