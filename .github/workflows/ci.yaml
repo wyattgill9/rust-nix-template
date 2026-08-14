@@ -18,9 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: DeterminateSystems/nix-installer-action@main
-      # Backs the store with the Actions cache, so the toolchain and crane's
-      # deps-only derivation survive between runs.
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - run: nix flake check -L
-      - run: nix build -L
+      - name: Evaluate:
+        run: nix flake check -L
+        
+      - name: Build
+        run: nix build -L
