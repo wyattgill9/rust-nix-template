@@ -43,7 +43,7 @@ nix/
 
 **New crate** — create `crates/my-crate/`, add it to `members` in the root `Cargo.toml`, then add `my-crate = mkCrate "my-crate";` to `nix/packages.nix`.
 
-**Native library** — add it to `buildInputs` in `nix/packages.nix` *and* `nix/devshell.nix`. `pkg-config` is present.
+**Native library** — add it to `buildInputs` in `nix/packages.nix` (plus `pkg-config` in `nativeBuildInputs` if the crate's build script needs it). The devshell inherits both lists.
 
 **Binary cache** — set `nixConfig.extra-substituters` and `extra-trusted-public-keys` in `flake.nix`.
 

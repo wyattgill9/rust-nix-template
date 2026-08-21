@@ -11,11 +11,9 @@
       inherit src;
       strictDeps = true;
 
+      # Native deps go here; the devshell inherits both lists.
       nativeBuildInputs = with pkgs; [];
-
-      buildInputs = with pkgs; [
-        openssl
-      ];
+      buildInputs = with pkgs; [];
     };
 
     cargoArtifacts = craneLib.buildDepsOnly commonArgs;
