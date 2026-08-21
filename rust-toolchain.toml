@@ -1,25 +1,12 @@
-# rust-toolchain.toml — Single source of truth for the Rust toolchain.
-#
-# Consumed by: Cargo, rust-analyzer, rustup, and rust-overlay (via Nix).
-# Non-Nix developers can use this same file with rustup.
+# Single source of truth for the Rust toolchain: Cargo, rustup,
+# rust-analyzer, and rust-overlay (via Nix) all read this file.
 
 [toolchain]
-channel = "stable"
-# For nightly, pin a specific date:
-# channel = "nightly-2026-04-01"
+channel = "stable"  # or a pinned nightly: "nightly-2026-04-01"
+profile = "default" # includes clippy and rustfmt
 
-profile = "default"
+# rust-src is CRITICAL on NixOS: rust-analyzer can't find std without it.
+# Add "llvm-tools-preview" if you pull in cargo-llvm-cov.
+components = ["rust-src", "rust-analyzer"]
 
-# rust-src is CRITICAL on NixOS: without it, rust-analyzer cannot find
-# the standard library sources.
-components = [
-  "rust-src",
-  "rust-analyzer",
-  "clippy",
-  "rustfmt",
-  # Required by cargo-llvm-cov; without it the tool errors out.
-  "llvm-tools-preview",
-]
-
-# Cross-compilation targets:
 # targets = ["wasm32-unknown-unknown", "aarch64-unknown-linux-gnu"]

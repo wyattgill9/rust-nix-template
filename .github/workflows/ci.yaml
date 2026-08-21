@@ -28,7 +28,6 @@ jobs:
       - name: Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
-      # Alternative: evaluate with fix
       # - name: Install fix
       #   env:
       #     FIX_VERSION: v0.3.0
@@ -38,8 +37,9 @@ jobs:
 
       - name: Evaluate
         run: nix flake check -L
-        # Alternative: fix flake check --extra-experimental-features flakes
-        # Alternative: evix, emits jobs-*.ndjson consumed by the Build step below
+        # fix:
+        # run: fix flake check --extra-experimental-features flakes
+        # evix:
         # run: |
         #   for root in checks packages devShells; do
         #     nix run github:manic-systems/evix -- eval \
@@ -53,7 +53,7 @@ jobs:
 
       - name: Build
         run: nix build -L
-        # Alternative: build only what the evix Evaluate step resolved
+        # evix:
         # run: |
         #   mapfile -t drvs < <(jq -r --arg s "$SYSTEM" 'select(.system == $s) | .drvPath + "^*"' jobs-checks.ndjson jobs-packages.ndjson)
         #   [ "${#drvs[@]}" -gt 0 ] || { echo "::error::nothing evaluated for $SYSTEM" && exit 1; }
