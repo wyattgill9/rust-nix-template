@@ -3,6 +3,7 @@
     pkgs,
     craneLib,
     config,
+    wildRustflags,
     ...
   }: let
     src = craneLib.cleanCargoSource ../.;
@@ -10,6 +11,9 @@
     commonArgs = {
       inherit src;
       strictDeps = true;
+
+      # wild linker for every crate (deps, bin, tests, clippy).
+      CARGO_BUILD_RUSTFLAGS = wildRustflags;
 
       # Native deps go here; the devshell inherits both lists.
       nativeBuildInputs = with pkgs; [];

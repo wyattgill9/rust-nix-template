@@ -3,10 +3,10 @@
     pkgs,
     rustToolchain,
     commonArgs,
-    wildStdenv,
+    wildRustflags,
     ...
   }: {
-    devShells.default = (pkgs.mkShell.override {stdenv = wildStdenv;}) {
+    devShells.default = pkgs.mkShell {
       inherit (commonArgs) buildInputs;
 
       nativeBuildInputs =
@@ -16,8 +16,10 @@
           pkgs.lldb
           pkgs.sccache
           pkgs.cargo-nextest
-        ]
-        ++ lib.optionals pkgs.stdenv.isLinux [pkgs.wild];
+        ];
+
+      # Same wild flags as the package build, so `cargo` here links with wild too.
+      CARGO_BUILD_RUSTFLAGS = wildRustflags;
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
       RUSTC_WRAPPER = "sccache";

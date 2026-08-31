@@ -7,20 +7,19 @@
 
     rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
 
-    # wild is Linux-only; the adapter throws on darwin, so guard it.
-    wildStdenv =
-      if pkgs.stdenv.hostPlatform.isLinux
-      then pkgs.stdenvAdapters.useWildLinker pkgs.stdenv
-      else pkgs.stdenv;
+    craneLib = (inputs.crane.mkLib pkgs).overrideToolchain (_: rustToolchain);
 
-    craneLib =
-      ((inputs.crane.mkLib pkgs).overrideToolchain (_: rustToolchain))
-      .overrideScope (_final: _prev: {
-        stdenvSelector = _p: wildStdenv;
-      });
+    # Force rustc onto wild (Linux/ELF only). rustc defaults to self-contained
+    # lld; disable it and point gcc at wild's `ld` via -B (gcc 15 rejects
+    # -fuse-ld=wild). Proof: `readelf -p .comment result/bin/cli` -> "Linker: Wild".
+    # When nixpkgs' default gcc reaches 16, collapse to "-C link-arg=-fuse-ld=wild".
+    wildRustflags =
+      if pkgs.stdenv.hostPlatform.isLinux
+      then "-C linker-features=-lld -C link-self-contained=-linker -C link-arg=-B${pkgs.wild}/bin"
+      else "";
   in {
     _module.args = {
-      inherit pkgs rustToolchain craneLib wildStdenv;
+      inherit pkgs rustToolchain craneLib wildRustflags;
     };
   };
 }
