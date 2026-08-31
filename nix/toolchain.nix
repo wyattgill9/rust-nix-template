@@ -7,10 +7,20 @@
 
     rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
 
-    craneLib = (inputs.crane.mkLib pkgs).overrideToolchain (_: rustToolchain);
+    # wild is Linux-only; the adapter throws on darwin, so guard it.
+    wildStdenv =
+      if pkgs.stdenv.hostPlatform.isLinux
+      then pkgs.stdenvAdapters.useWildLinker pkgs.stdenv
+      else pkgs.stdenv;
+
+    craneLib =
+      ((inputs.crane.mkLib pkgs).overrideToolchain (_: rustToolchain))
+      .overrideScope (_final: _prev: {
+        stdenvSelector = _p: wildStdenv;
+      });
   in {
     _module.args = {
-      inherit pkgs rustToolchain craneLib;
+      inherit pkgs rustToolchain craneLib wildStdenv;
     };
   };
 }
