@@ -2,11 +2,11 @@
   perSystem = {
     pkgs,
     rustToolchain,
-    lib,
     commonArgs,
+    wildStdenv,
     ...
   }: {
-    devShells.default = pkgs.mkShell {
+    devShells.default = (pkgs.mkShell.override {stdenv = wildStdenv;}) {
       inherit (commonArgs) buildInputs;
 
       nativeBuildInputs =
@@ -21,10 +21,6 @@
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
       RUSTC_WRAPPER = "sccache";
-
-      shellHook = lib.optionalString pkgs.stdenv.isLinux ''
-        export RUSTFLAGS="''${RUSTFLAGS:-} -C link-arg=-fuse-ld=wild"
-      '';
     };
   };
 }
