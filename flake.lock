@@ -1,17 +1,22 @@
 {
   "nodes": {
-    "crane": {
+    "cargo-dyndrv": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1785520756,
-        "narHash": "sha256-eGUJ3OJ+P4R6x9bN2xx/VTwhrhBt3U0CKtcY/B5xp50=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "fe4c37e1c9e4d5135a89c7f6a734da02e778c34b",
+        "lastModified": 1787591147,
+        "narHash": "sha256-6aCHcUtZYqoccS5CkqUxL9wiWc/cwYEOIxfQ6k+U8NY=",
+        "owner": "obsidiansystems",
+        "repo": "cargo-dyndrv",
+        "rev": "dc7103df39078cffcb336f03d91e6bf98eb30900",
         "type": "github"
       },
       "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
+        "owner": "obsidiansystems",
+        "repo": "cargo-dyndrv",
         "type": "github"
       }
     },
@@ -53,7 +58,7 @@
     },
     "root": {
       "inputs": {
-        "crane": "crane",
+        "cargo-dyndrv": "cargo-dyndrv",
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay",

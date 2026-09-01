@@ -19,8 +19,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    crane = {
-      url = "github:ipetkov/crane";
+    cargo-dyndrv = {
+      url = "github:obsidiansystems/cargo-dyndrv";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     treefmt-nix = {
