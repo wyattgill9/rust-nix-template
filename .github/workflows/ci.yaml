@@ -12,10 +12,15 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One runner per system the flake claims to support.
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+
+    runs-on: ${{ matrix.os }}
 
     permissions:
-      id-token: write
       contents: read
 
     steps:
@@ -25,36 +30,15 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
-      # - name: Install fix
-      #   env:
-      #     FIX_VERSION: v0.3.0
-      #   run: |
-      #     curl -sSfL "https://github.com/psyclyx/fix/releases/download/$FIX_VERSION/fix-$FIX_VERSION-x86_64-linux.tar.gz" \
-      #       | tar xz -C /usr/local --strip-components=1
-
       - name: Evaluate
         run: nix flake check -L
-        # fix:
-        # run: fix flake check --extra-experimental-features flakes
-        # evix:
-        # run: |
-        #   for root in checks packages devShells; do
-        #     nix run github:manic-systems/evix -- eval \
-        #       --flake ".#$root" --force-recurse \
-        #       --workers "$(nproc)" \
-        #       > "jobs-$root.ndjson"
-        #   done
-        #   if jq -e 'select(has("error"))' jobs-*.ndjson; then
-        #     echo "::error::flake evaluation failed" && exit 1
-        #   fi
 
       - name: Build
         run: nix build -L
-        # evix:
-        # run: |
-        #   mapfile -t drvs < <(jq -r --arg s "$SYSTEM" 'select(.system == $s) | .drvPath + "^*"' jobs-checks.ndjson jobs-packages.ndjson)
-        #   [ "${#drvs[@]}" -gt 0 ] || { echo "::error::nothing evaluated for $SYSTEM" && exit 1; }
-        #   nix build -L --keep-going "${drvs[@]}"
+
+      # rustc silently falls back to its bundled lld if the wild flags stop
+      # taking effect, and the build still passes. wild is ELF-only.
+      - name: Verify wild linked the binary
+        if: runner.os == 'Linux'
+        run: |
+          readelf -p .comment result/bin/cli | grep 'Linker: Wild'

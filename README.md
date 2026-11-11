@@ -45,7 +45,7 @@ nix/
 
 **Native library** — add it to `buildInputs` in `nix/packages.nix` (plus `pkg-config` in `nativeBuildInputs` if the crate's build script needs it). The devshell inherits both lists.
 
-**Binary cache** — set `nixConfig.extra-substituters` and `extra-trusted-public-keys` in `flake.nix`.
+**Binary cache** — uncomment the `nixConfig` block in `flake.nix` and fill in `extra-substituters` and `extra-trusted-public-keys`.
 
 ## Build model
 
