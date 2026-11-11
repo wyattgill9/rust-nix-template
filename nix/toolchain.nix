@@ -9,14 +9,16 @@
 
     craneLib = (inputs.crane.mkLib pkgs).overrideToolchain (_: rustToolchain);
 
-    # Force rustc onto wild (Linux/ELF only). rustc defaults to self-contained
-    # lld; disable it and point gcc at wild's `ld` via -B (gcc 15 rejects
-    # -fuse-ld=wild). Proof: `readelf -p .comment result/bin/cli` -> "Linker: Wild".
-    # When nixpkgs' default gcc reaches 16, collapse to "-C link-arg=-fuse-ld=wild".
-    wildRustflags =
-      if pkgs.stdenv.hostPlatform.isLinux
-      then "-C linker-features=-lld -C link-self-contained=-linker -C link-arg=-B${pkgs.wild}/bin"
-      else "";
+    # Force rustc onto wild (Linux/ELF only) by pointing gcc at wild's `ld` via
+    # -B. CI proves it: `readelf -p .comment result/bin/cli` -> "Linker: Wild".
+    #
+    # x86_64 also has to switch off rustc's self-contained lld first, which is
+    # the default there. Only there: no other target bundles lld, and rustc
+    # rejects these two flags as unstable on aarch64.
+    wildRustflags = pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux (
+      pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isx86_64 "-C linker-features=-lld -C link-self-contained=-linker "
+      + "-C link-arg=-B${pkgs.wild}/bin"
+    );
   in {
     _module.args = {
       inherit pkgs rustToolchain craneLib wildRustflags;
