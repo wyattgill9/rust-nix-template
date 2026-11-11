@@ -35,3 +35,9 @@ jobs:
 
       - name: Build
         run: nix build -L
+
+      # rustc silently falls back to its bundled lld if the wild flags stop
+      # taking effect, and the build still passes. wild is ELF-only.
+      - name: Verify wild linked the binary
+        if: runner.os == 'Linux'
+        run: readelf -p .comment result/bin/cli | grep 'Linker: Wild'
