@@ -12,7 +12,13 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One runner per system the flake claims to support.
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+
+    runs-on: ${{ matrix.os }}
 
     permissions:
       contents: read
