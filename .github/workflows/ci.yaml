@@ -40,4 +40,5 @@ jobs:
       # taking effect, and the build still passes. wild is ELF-only.
       - name: Verify wild linked the binary
         if: runner.os == 'Linux'
-        run: readelf -p .comment result/bin/cli | grep 'Linker: Wild'
+        run: |
+          readelf -p .comment result/bin/cli | grep 'Linker: Wild'
