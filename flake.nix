@@ -1,6 +1,11 @@
 {
   description = "NixOS Rust workspace";
 
+  # nixConfig = {
+  #   extra-substituters = [];
+  #   extra-trusted-public-keys = [];
+  # };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
